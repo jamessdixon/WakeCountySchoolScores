@@ -22,11 +22,25 @@ let tables = body.Descendants("TABLE") |> Seq.toList
 let schoolTable = tables.[0]
 let schoolRows = schoolTable.Descendants("TR") |> Seq.toList
 let schoolData = schoolRows |> Seq.collect(fun r -> r.Descendants("TD")) |>Seq.toList
-let schoolData' = schoolData |> Seq.map(fun d -> d.InnerText()) 
+let schoolData' = schoolData |> Seq.map(fun d -> d.InnerText().Trim()) 
 let schoolData'' = schoolData' |> Seq.filter(fun s -> s <> System.String.Empty) 
 
-schoolData'' |> Seq.length
+//Strip out noise
+let removeNonEssentialData (s:string) =
+    let markerPosition = s.IndexOf('(')
+    match markerPosition with
+    | -1 -> s
+    | _ -> s.Substring(0,markerPosition).Trim()
 
+let schoolData''' = schoolData'' |> Seq.map(fun s -> removeNonEssentialData(s))
+
+let unimportantPhrases = [|"Neighborhood Busing";"This school has an enrollment cap"|]
+let containsUnimportantPhrase (s:string) =
+    unimportantPhrases |> Seq.exists(fun p -> s.Contains(p))
+
+let schoolData'''' = schoolData''' |> Seq.filter(fun s -> containsUnimportantPhrase(s) = false )
+
+schoolData''''
 
 
 //For Blog #1
