@@ -11,15 +11,33 @@ let uri = "http://wwwgis2.wcpss.net/addressLookup/index.php"
 let streetLookup = "StreetTemplateValue=STRATH&StreetName=Strathorn+Dr+Cary&StreetNumber=904&SubmitAddressSelectPage=CONTINUE&DefaultAction=SubmitAddressSelectPage"
 let streetLookup' = "SelectAssignment%7C2014%7CCURRENT=2014-15&DefaultAction=SelectAssignment%7C2014%7CCURRENT&DefaultAction=SelectAssignment%7C2015%7CCURRENT&CatchmentCode=CA+0198.2&StreetName=Strathorn+Dr+Cary&StreetTemplateValue=STRATH&StreetNumber=904&StreetZipCode=27519"
 
-//CatchmentCode=CA+0198.2
-
 let webClient = new WebClient()
 webClient.Headers.Add("Content-Type", "application/x-www-form-urlencoded")
-let result = webClient.UploadString(uri,"POST",streetLookup')
-let body = context'.Parse(result).Html.Body()
 
-let tables = body.Descendants("TABLE") |> Seq.toList
-let schoolTable = tables.[0]
+//Page1 Query String
+
+
+//CatchmentCode
+let result = webClient.UploadString(uri,"POST",streetLookup)
+let body = context.Parse(result).Html.Body()
+let inputs = body.Descendants("INPUT") |> Seq.toList
+let inputs' = inputs |> Seq.map(fun i -> i.Attribute("name").Value(),i.Attribute("value").Value())
+let getValueFromInput(nameToFind:string) =
+    inputs' |> Seq.filter(fun (n,v) -> n = nameToFind) 
+                                |> Seq.map(fun (n,v) -> v)
+                                |> Seq.head
+let catchmentCode = getValueFromInput("CatchmentCode") 
+let streetName = getValueFromInput("StreetName") 
+let streetTemplateValue = getValueFromInput("StreetTemplateValue") 
+let streetNumber =getValueFromInput("StreetNumber") 
+let streetZipCode = getValueFromInput("StreetZipCode") 
+
+//School Stuff
+let result' = webClient.UploadString(uri,"POST",streetLookup')
+let body' = context'.Parse(result).Html.Body()
+
+let tables' = body'.Descendants("TABLE") |> Seq.toList
+let schoolTable = tables'.[0]
 let schoolRows = schoolTable.Descendants("TR") |> Seq.toList
 let schoolData = schoolRows |> Seq.collect(fun r -> r.Descendants("TD")) |>Seq.toList
 let schoolData' = schoolData |> Seq.map(fun d -> d.InnerText().Trim()) 
@@ -43,19 +61,6 @@ let schoolData'''' = schoolData''' |> Seq.filter(fun s -> containsUnimportantPhr
 schoolData''''
 
 
-//For Blog #1
-//schoolRows |> Seq.mapi(fun r i -> r.[i].Descendants("TD"))
-
-//let tables = body.Descendants("TABLE") |> Seq.toList
-//let schoolTable = tables.[0]
-//let schoolRows = schoolTable.Descendants("TR") |> Seq.toList
-//let elementaryDatas = schoolRows.[0].Descendants("TD") |> Seq.toList
-//let elementarySchool = elementaryDatas.[1].InnerText()
-//let middleSchoolDatas = schoolRows.[1].Descendants("TD") |> Seq.toList
-//let middleSchool = middleSchoolDatas.[1].InnerText()
-////Need to skip for the enrollement cap message
-//let highSchoolDatas = schoolRows.[3].Descendants("TD") |> Seq.toList
-//let highSchool = highSchoolDatas.[1].InnerText()
 
 
 
