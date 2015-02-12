@@ -21,13 +21,27 @@ let body = context'.Parse(result).Html.Body()
 let tables = body.Descendants("TABLE") |> Seq.toList
 let schoolTable = tables.[0]
 let schoolRows = schoolTable.Descendants("TR") |> Seq.toList
-let elementaryDatas = schoolRows.[0].Descendants("TD") |> Seq.toList
-let elementarySchool = elementaryDatas.[1].InnerText()
-let middleSchoolDatas = schoolRows.[1].Descendants("TD") |> Seq.toList
-let middleSchool = middleSchoolDatas.[1].InnerText()
-//Need to skip for the enrollement cap message
-let highSchoolDatas = schoolRows.[3].Descendants("TD") |> Seq.toList
-let highSchool = highSchoolDatas.[1].InnerText()
+let schoolData = schoolRows |> Seq.collect(fun r -> r.Descendants("TD")) |>Seq.toList
+let schoolData' = schoolData |> Seq.map(fun d -> d.InnerText()) 
+let schoolData'' = schoolData' |> Seq.filter(fun s -> s <> System.String.Empty) 
+
+schoolData'' |> Seq.length
+
+
+
+//For Blog #1
+//schoolRows |> Seq.mapi(fun r i -> r.[i].Descendants("TD"))
+
+//let tables = body.Descendants("TABLE") |> Seq.toList
+//let schoolTable = tables.[0]
+//let schoolRows = schoolTable.Descendants("TR") |> Seq.toList
+//let elementaryDatas = schoolRows.[0].Descendants("TD") |> Seq.toList
+//let elementarySchool = elementaryDatas.[1].InnerText()
+//let middleSchoolDatas = schoolRows.[1].Descendants("TD") |> Seq.toList
+//let middleSchool = middleSchoolDatas.[1].InnerText()
+////Need to skip for the enrollement cap message
+//let highSchoolDatas = schoolRows.[3].Descendants("TD") |> Seq.toList
+//let highSchool = highSchoolDatas.[1].InnerText()
 
 
 
