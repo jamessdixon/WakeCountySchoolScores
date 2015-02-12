@@ -1,0 +1,1 @@
+combine <- merge(NCScores, WakeCountySchoolInfo, by.x="School", by.y="School.Name")

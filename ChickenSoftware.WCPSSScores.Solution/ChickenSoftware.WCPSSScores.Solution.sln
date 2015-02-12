@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ChickenSoftware.WCPSSScores", "ChickenSoftware.WCPSSScores\ChickenSoftware.WCPSSScores.fsproj", "{2D90A61F-623B-4D83-9DC6-C620F5EBD730}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{13537F42-463D-4F63-8E1F-F6E1D7C59614}"
+	ProjectSection(SolutionItems) = preProject
+		data\RealEstateSample.html = data\RealEstateSample.html
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2D90A61F-623B-4D83-9DC6-C620F5EBD730}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D90A61F-623B-4D83-9DC6-C620F5EBD730}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D90A61F-623B-4D83-9DC6-C620F5EBD730}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D90A61F-623B-4D83-9DC6-C620F5EBD730}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
