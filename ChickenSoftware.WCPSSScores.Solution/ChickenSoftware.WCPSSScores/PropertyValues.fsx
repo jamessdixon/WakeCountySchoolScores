@@ -1,9 +1,7 @@
 ﻿//Get all addresses in wake county
 //Get property value of house
-//Get school assignment
 
 //http://services.wakegov.com/realestate/Account.asp?id=0000001
-
 
 #r "../packages/FSharp.Data.2.1.1/lib/net40/FSharp.Data.dll"
 
