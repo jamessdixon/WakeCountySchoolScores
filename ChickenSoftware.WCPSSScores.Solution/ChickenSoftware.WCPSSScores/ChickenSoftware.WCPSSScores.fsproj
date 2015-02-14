@@ -51,6 +51,7 @@
   <ItemGroup>
     <None Include="PropertyValues.fsx" />
     <None Include="SchoolAssignments.fsx" />
+    <None Include="matchPropertyValuesToSchoolAssignment.fsx" />
     <Content Include="packages.config" />
     <Content Include="app.config" />
   </ItemGroup>

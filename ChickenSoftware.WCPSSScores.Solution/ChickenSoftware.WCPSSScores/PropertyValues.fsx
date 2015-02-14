@@ -12,16 +12,17 @@ open System.IO
 open FSharp.Data
 open System.Linq
 open Microsoft.Azure.Documents
+open System.Text.RegularExpressions
 open Microsoft.Azure.Documents.Client
 open Microsoft.Azure.Documents.Linq
 
 type context = HtmlProvider<"../data/RealEstateSample.html">
-type HouseValuation = {addressOne:string; addressTwo:string; addressThree:string; assessedValue:string}
+type HouseValuation = {index: int; addressOne:string; addressTwo:string; addressThree:string; assessedValue:string}
 
 let createUri(id: int) = 
-    "http://services.wakegov.com/realestate/Account.asp?id=" + id.ToString("D7")
+    id, "http://services.wakegov.com/realestate/Account.asp?id=" + id.ToString("D7")
 
-let getValuation(uri: string)=
+let getValuation(index: int, uri: string)=
     try
         let body = context.Load(uri).Html.Body()
         let tables = body.Descendants("TABLE") |> Seq.toList
@@ -35,8 +36,7 @@ let getValuation(uri: string)=
         let fonts' = taxTable.Descendants("font") |> Seq.toList
         let assessedValue = fonts'.[3].InnerText()
 
-
-        let result = {addressOne=addressOne;addressTwo=addressTwo;addressThree=addressThree;assessedValue=assessedValue}
+        let result = {index=index; addressOne=addressOne;addressTwo=addressTwo;addressThree=addressThree;assessedValue=assessedValue}
         Some result
     with
           | :? System.ArgumentException ->  None
@@ -45,7 +45,9 @@ let getValuation(uri: string)=
 let createHouseValueJson(houseValuation:option<HouseValuation>) =
     match houseValuation.IsSome with
     | true ->
+        let index = houseValuation.Value.index.ToString()
         let result = JsonValue.Record [| 
+                        "index", JsonValue.String index
                         "addressOne", JsonValue.String houseValuation.Value.addressOne
                         "addressTwo", JsonValue.String houseValuation.Value.addressTwo
                         "addressThree", JsonValue.String houseValuation.Value.addressThree
@@ -72,7 +74,7 @@ let writeValuationToDocumentDb(houseValuation:option<HouseValuation>) =
     
 let doValuationToDisk(id: int) =
     createUri id
-    |> getValuation
+    |> getValuation 
     |> createHouseValueJson
     |> writeValuationToDisk
     |> ignore

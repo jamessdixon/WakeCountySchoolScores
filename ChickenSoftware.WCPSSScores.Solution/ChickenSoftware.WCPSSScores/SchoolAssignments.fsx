@@ -55,7 +55,7 @@ let getServerGeneratedParameters(queryString:string)=
         Some result'
     with
           | :? System.ArgumentException ->  None
-          | :? System.Exception -> None
+          | _ -> None
 
 let createSearchCriteria' (searchCriteria:SearchCriteria) =
     let page1QueryString = createPage1QueryString(searchCriteria)
@@ -123,17 +123,13 @@ let getSchoolData(queryString:option<string>) =
     | false -> None
 
 
-type jsonResult = {searchCriteria: SearchCriteria; schools:string[]}
-//TODO Start here
-//        let foo = JsonValue.Array schoolData.Value
 
 
-let writeSchoolData(schoolData: Option<string>) =
+let writeSchoolDataToDisk(schoolData: Option<string>) =
     match schoolData.IsSome with
     | true -> 
         File.AppendAllText(@"C:\Data\assignmentData.json",schoolData.Value.ToString() + "," )
     | false -> ()
-
 
 let streetName = composeStreetNameFromIndividualComponents("Strathorn","Dr","Cary")
 let searchCriteria = {SearchCriteria.streetTemplateValue="STRATH";streetName=streetName;streetNumber="904"}
