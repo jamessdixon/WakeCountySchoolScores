@@ -20,9 +20,6 @@ type SearchCriteria' = {catchmentCode:string;
 
 let uri = "http://wwwgis2.wcpss.net/addressLookup/index.php"
 
-let webClient = new WebClient()
-webClient.Headers.Add("Content-Type", "application/x-www-form-urlencoded")
-
 let composeStreetNameFromIndividualComponents(street:string, suffix:string, city:string) =
     street + "+" + suffix + "+" + city
 
@@ -40,6 +37,8 @@ let createPage1QueryString(searchCriteria:SearchCriteria)=
 
 let getServerGeneratedParameters(queryString:string)=
     try
+        use webClient = new WebClient()
+        webClient.Headers.Add("Content-Type", "application/x-www-form-urlencoded")
         let result = webClient.UploadString(uri,"POST",queryString)
         let body = context.Parse(result).Html.Body()
         let inputs = body.Descendants("INPUT") |> Seq.toList
@@ -93,7 +92,9 @@ let createPage2QueryString(searchCriteria:option<SearchCriteria'>)=
 let getSchoolData(queryString:option<string>) =
     match queryString.IsSome with
     | true ->
-        let result = webClient.UploadString(uri,"POST",plug)
+        use webClient = new WebClient()
+        webClient.Headers.Add("Content-Type", "application/x-www-form-urlencoded")
+        let result = webClient.UploadString(uri,"POST",queryString.Value)
         let body = context'.Parse(result).Html.Body()
 
         let tables = body.Descendants("TABLE") |> Seq.toList
@@ -126,4 +127,3 @@ let result = createSearchCriteria'(searchCriteria)
                 |> createPage2QueryString
                 |> getSchoolData
 result.Value
-
