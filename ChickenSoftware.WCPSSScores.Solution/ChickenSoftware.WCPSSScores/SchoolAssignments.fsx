@@ -1,6 +1,7 @@
 ﻿
 #r "../packages/FSharp.Data.2.1.1/lib/net40/FSharp.Data.dll"
 
+open System.IO
 open System.Net
 open System.Text
 open FSharp.Data
@@ -120,6 +121,19 @@ let getSchoolData(queryString:option<string>) =
         let schoolData'''' = schoolData''' |> Seq.filter(fun s -> containsUnimportantPhrase(s) = false )
         Some schoolData''''
     | false -> None
+
+
+type jsonResult = {searchCriteria: SearchCriteria; schools:string[]}
+//TODO Start here
+//        let foo = JsonValue.Array schoolData.Value
+
+
+let writeSchoolData(schoolData: Option<string>) =
+    match schoolData.IsSome with
+    | true -> 
+        File.AppendAllText(@"C:\Data\assignmentData.json",schoolData.Value.ToString() + "," )
+    | false -> ()
+
 
 let streetName = composeStreetNameFromIndividualComponents("Strathorn","Dr","Cary")
 let searchCriteria = {SearchCriteria.streetTemplateValue="STRATH";streetName=streetName;streetNumber="904"}
