@@ -53,6 +53,7 @@
     <None Include="SchoolAssignments.fsx" />
     <Content Include="packages.config" />
     <Content Include="app.config" />
+    <None Include="Script2.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Data">
