@@ -24,17 +24,33 @@ let uri = "http://wwwgis2.wcpss.net/addressLookup/index.php"
 let composeStreetNameFromIndividualComponents(street:string, suffix:string, city:string) =
     street + "+" + suffix + "+" + city
 
+let createTitleCase(s:string)=
+    let chars = s.ToCharArray()
+    let firstLetter = chars.[0..0] |> Array.map(fun c -> System.Char.ToUpper(c))
+    let remainingLetters = chars.[1..] |> Array.map(fun c -> System.Char.ToLower(c))
+    let chars' = Array.append firstLetter remainingLetters
+    System.String.Concat(chars')
+
+
 let createPage1QueryString(searchCriteria:SearchCriteria)=
+    let streetTemplateValue' = createTitleCase(searchCriteria.streetTemplateValue)
+    let words = searchCriteria.streetName.Split('+')
+    let words' = words |> Array.map(fun w -> createTitleCase(w))
+    let streetName' = words' |> String.concat("+")
     let stringBuilder = new StringBuilder()
     stringBuilder.Append("StreetTemplateValue=") |> ignore
-    stringBuilder.Append(searchCriteria.streetTemplateValue) |> ignore
+    stringBuilder.Append(streetTemplateValue') |> ignore
     stringBuilder.Append("&StreetName=") |> ignore
-    stringBuilder.Append(searchCriteria.streetName) |> ignore
+    stringBuilder.Append(streetName') |> ignore
     stringBuilder.Append("&StreetNumber=") |> ignore
     stringBuilder.Append(searchCriteria.streetNumber) |> ignore
     stringBuilder.Append("&SubmitAddressSelectPage=CONTINUE") |> ignore
     stringBuilder.Append("&DefaultAction=SubmitAddressSelectPage") |> ignore
     stringBuilder.ToString()
+
+//let searchCriteria = {SearchCriteria.streetTemplateValue="WAKE";streetName="WAKE+FOREST+RD+RALEIGH";streetNumber="1506"}
+//let queryString = createPage1QueryString(searchCriteria)
+//queryString
 
 let getServerGeneratedParameters(queryString:string)=
     try
@@ -57,16 +73,24 @@ let getServerGeneratedParameters(queryString:string)=
           | :? System.ArgumentException ->  None
           | _ -> None
 
-let createSearchCriteria' (searchCriteria:SearchCriteria) =
-    let page1QueryString = createPage1QueryString(searchCriteria)
-    let serverParameters = getServerGeneratedParameters(page1QueryString)
-    match serverParameters.IsSome with
+//let searchCriteria = {SearchCriteria.streetTemplateValue="WAKE";streetName="WAKE+FOREST+RD+RALEIGH";streetNumber="1506"}
+//let queryString = createPage1QueryString(searchCriteria)
+//let result= getServerGeneratedParameters(queryString)
+//result
+
+let createSearchCriteria' (searchCriteria:option<SearchCriteria>) =
+    match searchCriteria.IsSome with
     | true -> 
-        Some {catchmentCode=fst serverParameters.Value;
-        streetName=searchCriteria.streetName;
-        streetTemplateValue=searchCriteria.streetTemplateValue;
-        streetNumber=searchCriteria.streetNumber;
-        streetZipCode=snd serverParameters.Value}
+        let page1QueryString = createPage1QueryString(searchCriteria.Value)
+        let serverParameters = getServerGeneratedParameters(page1QueryString)
+        match serverParameters.IsSome with
+        | true -> 
+            Some {catchmentCode=fst serverParameters.Value;
+            streetName=searchCriteria.Value.streetName;
+            streetTemplateValue=searchCriteria.Value.streetTemplateValue;
+            streetNumber=searchCriteria.Value.streetNumber;
+            streetZipCode=snd serverParameters.Value}
+        | false -> None
     | false -> None
 
 let createPage2QueryString(searchCriteria:option<SearchCriteria'>)=
@@ -93,33 +117,38 @@ let createPage2QueryString(searchCriteria:option<SearchCriteria'>)=
 let getSchoolData(queryString:option<string>) =
     match queryString.IsSome with
     | true ->
-        use webClient = new WebClient()
-        webClient.Headers.Add("Content-Type", "application/x-www-form-urlencoded")
-        let result = webClient.UploadString(uri,"POST",queryString.Value)
-        let body = context'.Parse(result).Html.Body()
+        try
+            use webClient = new WebClient()
+            webClient.Headers.Add("Content-Type", "application/x-www-form-urlencoded")
+            let result = webClient.UploadString(uri,"POST",queryString.Value)
+            let body = context'.Parse(result).Html.Body()
 
-        let tables = body.Descendants("TABLE") |> Seq.toList
-        let schoolTable = tables.[0]
-        let schoolRows = schoolTable.Descendants("TR") |> Seq.toList
-        let schoolData = schoolRows |> Seq.collect(fun r -> r.Descendants("TD")) |>Seq.toList
-        let schoolData' = schoolData |> Seq.map(fun d -> d.InnerText().Trim()) 
-        let schoolData'' = schoolData' |> Seq.filter(fun s -> s <> System.String.Empty) 
+            let tables = body.Descendants("TABLE") |> Seq.toList
+            let schoolTable = tables.[0]
+            let schoolRows = schoolTable.Descendants("TR") |> Seq.toList
+            let schoolData = schoolRows |> Seq.collect(fun r -> r.Descendants("TD")) |>Seq.toList
+            let schoolData' = schoolData |> Seq.map(fun d -> d.InnerText().Trim()) 
+            let schoolData'' = schoolData' |> Seq.filter(fun s -> s <> System.String.Empty) 
 
-        let removeNonEssentialData (s:string) =
-            let markerPosition = s.IndexOf('(')
-            match markerPosition with
-            | -1 -> s
-            | _ -> s.Substring(0,markerPosition).Trim()
+            let removeNonEssentialData (s:string) =
+                let markerPosition = s.IndexOf('(')
+                match markerPosition with
+                | -1 -> s
+                | _ -> s.Substring(0,markerPosition).Trim()
 
-        let schoolData''' = schoolData'' |> Seq.map(fun s -> removeNonEssentialData(s))
-        let unimportantPhrases = [|"Neighborhood Busing";
-                                "This school has an enrollment cap";
-                                "2015 BASE ATTENDANCE AREA";
-                                "2014 BASE ATTENDANCE AREA"|]
-        let containsUnimportantPhrase (s:string) =
-            unimportantPhrases |> Seq.exists(fun p -> s.Contains(p))
-        let schoolData'''' = schoolData''' |> Seq.filter(fun s -> containsUnimportantPhrase(s) = false )
-        Some schoolData''''
+            let schoolData''' = schoolData'' |> Seq.map(fun s -> removeNonEssentialData(s))
+            let unimportantPhrases = [|"Neighborhood Busing";
+                                    "This school has an enrollment cap";
+                                    "2015 BASE ATTENDANCE AREA";
+                                    "2014 BASE ATTENDANCE AREA"|]
+            let containsUnimportantPhrase (s:string) =
+                unimportantPhrases |> Seq.exists(fun p -> s.Contains(p))
+            let schoolData'''' = schoolData''' |> Seq.filter(fun s -> containsUnimportantPhrase(s) = false )
+            Some schoolData'''' 
+        with
+              | :? System.Net.WebException ->  None
+              | _ -> None
+        
     | false -> None
 
 let writeSchoolDataToDisk(schoolData: Option<string>) =

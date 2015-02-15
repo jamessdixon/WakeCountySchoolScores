@@ -15,6 +15,7 @@ open Microsoft.Azure.Documents.Client
 open Microsoft.Azure.Documents.Linq
 
 type HouseValuation = JsonProvider<"../data/HouseValuationSample.json">
+type HouseAssignment = {houseIndex:int; schools: seq<string>}
 
 let getPropertyValue(id: int)=
         let endpointUrl = "https://chickensoftware.documents.azure.com:443/"
@@ -25,30 +26,62 @@ let getPropertyValue(id: int)=
         let documentLink = collection.SelfLink
         let queryString = "SELECT * FROM taxinformation WHERE taxinformation.index = " + id.ToString()
         let query = client.CreateDocumentQuery(documentLink,queryString)
-        let firstValue = query |> Seq.head
-        HouseValuation.Parse(firstValue.ToString())
-   
-let createSchoolAssignmentSearchCriteria(houseValuation: HouseValuation.Root) =
-    let deliminators = [|(char)32;(char)160|]
-    let addressOneTokens = houseValuation.AddressOne.Split(deliminators)
-    let streetNumber = addressOneTokens.[0]
-    let streetTemplateValue = addressOneTokens.[2]
-    let streetName = addressOneTokens.[1..] |> Array.reduce(fun acc t -> acc + "+" + t)
-    let addressTwoTokens = houseValuation.AddressTwo.Split(deliminators)
-    let city = addressTwoTokens.[0]
-    let streetName' = streetName + city
-    {SearchCriteria.streetTemplateValue=streetTemplateValue;
-    streetName=streetName';
-    streetNumber=streetNumber;}
+        match query |> Seq.length with
+        | 0 -> None
+        | _ -> let firstValue = query |> Seq.head
+               let firstValue' = HouseValuation.Parse(firstValue.ToString())
+               Some firstValue'
 
-let result = getPropertyValue(1) 
-             |> createSchoolAssignmentSearchCriteria
-             |> createSearchCriteria'
-             |> createPage2QueryString
-             |> getSchoolData
+let createSchoolAssignmentSearchCriteria(houseValuation: option<HouseValuation.Root>) =
+    match houseValuation.IsSome with
+    | true -> let deliminators = [|(char)32;(char)160|]
+              let addressOneTokens = houseValuation.Value.AddressOne.Split(deliminators)
+              let streetNumber = addressOneTokens.[0]
+              let streetTemplateValue = addressOneTokens.[1]
+              let streetName = addressOneTokens.[1..] |> Array.reduce(fun acc t -> acc + "+" + t)
+              let addressTwoTokens = houseValuation.Value.AddressTwo.Split(deliminators)
+              let city = addressTwoTokens.[0]
+              let streetName' = streetName + city
+              Some {SearchCriteria.streetTemplateValue=streetTemplateValue;
+               streetName=streetName';
+               streetNumber=streetNumber;}
+    | false -> None
+    
+let writeSchoolAssignmentToDocumentDb(houseAssignment:option<HouseAssignment>) =
+    match houseAssignment.IsSome with
+    | true -> 
+        let endpointUrl = "https://chickensoftware.documents.azure.com:443/"
+        let authKey = "rk3sqMc6W/hB6SQEoaL8Yi1dvSn4C5VmvnrMdPSBQna3L8eCLMwnZeIJNpH8graTfV+GRxR2pYUUBFo5rdQuww=="
+        let client = new DocumentClient(new Uri(endpointUrl), authKey) 
+        let database = client.CreateDatabaseQuery().Where(fun db -> db.Id = "wakecounty" ).ToArray().FirstOrDefault()
+        let collection = client.CreateDocumentCollectionQuery(database.CollectionsLink).Where(fun dc -> dc.Id = "houseassignment").ToArray().FirstOrDefault()
+        let documentLink = collection.SelfLink
+        client.CreateDocumentAsync(documentLink, houseAssignment.Value) |> ignore
+    | false -> ()
 
+let createHouseAssignment(id:int)=
+    let houseValuation = getPropertyValue(id)
+    let schools = houseValuation
+                     |> createSchoolAssignmentSearchCriteria
+                     |> createSearchCriteria'
+                     |> createPage2QueryString
+                     |> getSchoolData
+    match schools.IsSome with
+    | true -> Some {houseIndex=houseValuation.Value.Index; schools=schools.Value}
+    | false -> None
 
+//let result = createHouseAssignment 2
+//result
 
+let generateHouseAssignment(id:int)=
+    createHouseAssignment id
+    |> writeSchoolAssignmentToDocumentDb
+    ()
+
+let result = generateHouseAssignment 1
+
+#time
+[2..100] |> Seq.iter(fun id -> generateHouseAssignment id)
 
 
 
