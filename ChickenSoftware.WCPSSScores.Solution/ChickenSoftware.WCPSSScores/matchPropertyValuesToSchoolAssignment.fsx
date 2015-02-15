@@ -78,10 +78,10 @@ let generateHouseAssignment(id:int)=
     |> writeSchoolAssignmentToDocumentDb
     ()
 
-let result = generateHouseAssignment 1
+//let result = generateHouseAssignment 1
 
-#time
-[2..100] |> Seq.iter(fun id -> generateHouseAssignment id)
+//#time
+//[2..100] |> Seq.iter(fun id -> generateHouseAssignment id)
 
 
 
