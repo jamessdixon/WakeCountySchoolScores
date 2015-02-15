@@ -85,7 +85,7 @@ let doValuationToDocumentDb(id: int) =
     |> writeValuationToDocumentDb
     |> ignore
 
-#time
-[1..100] |> Seq.iter(fun id -> doValuationToDocumentDb id)
+//#time
+//[1..100] |> Seq.iter(fun id -> doValuationToDocumentDb id)
 
 

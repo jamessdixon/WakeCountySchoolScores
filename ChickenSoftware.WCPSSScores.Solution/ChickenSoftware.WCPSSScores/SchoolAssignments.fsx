@@ -122,18 +122,15 @@ let getSchoolData(queryString:option<string>) =
         Some schoolData''''
     | false -> None
 
-
-
-
 let writeSchoolDataToDisk(schoolData: Option<string>) =
     match schoolData.IsSome with
     | true -> 
         File.AppendAllText(@"C:\Data\assignmentData.json",schoolData.Value.ToString() + "," )
     | false -> ()
 
-let streetName = composeStreetNameFromIndividualComponents("Strathorn","Dr","Cary")
-let searchCriteria = {SearchCriteria.streetTemplateValue="STRATH";streetName=streetName;streetNumber="904"}
-let result = createSearchCriteria'(searchCriteria)
-                |> createPage2QueryString
-                |> getSchoolData
-result.Value
+//let streetName = composeStreetNameFromIndividualComponents("Strathorn","Dr","Cary")
+//let searchCriteria = {SearchCriteria.streetTemplateValue="STRATH";streetName=streetName;streetNumber="904"}
+//let result = createSearchCriteria'(searchCriteria)
+//                |> createPage2QueryString
+//                |> getSchoolData
+//result.Value
