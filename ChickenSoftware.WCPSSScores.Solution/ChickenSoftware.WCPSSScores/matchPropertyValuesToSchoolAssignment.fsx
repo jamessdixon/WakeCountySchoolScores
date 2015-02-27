@@ -2,6 +2,7 @@
 #r "../packages/FSharp.Data.2.1.1/lib/net40/FSharp.Data.dll"
 #r "../packages/Microsoft.Azure.Documents.Client.0.9.2-preview/lib/net40/Microsoft.Azure.Documents.Client.dll"
 #r "../packages/Newtonsoft.Json.4.5.11/lib/net40/Newtonsoft.Json.dll"
+#r "../packages/FSharp.Collections.ParallelSeq.1.0.2/lib/net40/FSharp.Collections.ParallelSeq.dll"
 
 #load "SchoolAssignments.fsx"
 
@@ -13,6 +14,7 @@ open SchoolAssignments
 open Microsoft.Azure.Documents
 open Microsoft.Azure.Documents.Client
 open Microsoft.Azure.Documents.Linq
+open FSharp.Collections.ParallelSeq
 
 type HouseValuation = JsonProvider<"../data/HouseValuationSample.json">
 type HouseAssignment = {houseIndex:int; schools: seq<string>}

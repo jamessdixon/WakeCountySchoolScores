@@ -52,13 +52,17 @@
     <None Include="PropertyValues.fsx" />
     <None Include="SchoolAssignments.fsx" />
     <None Include="MatchPropertyValuesToSchoolAssignment.fsx" />
-    <None Include="SchoolList.fsx" />
+    <None Include="CreateSchoolValuationBase.fsx" />
     <None Include="SampleSchoolAssignment.fsx" />
-    <None Include="HousePyramid.fsx" />
     <Content Include="packages.config" />
+    <None Include="CreateSchoolList.fsx" />
     <Content Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Collections.ParallelSeq">
+      <HintPath>..\packages\FSharp.Collections.ParallelSeq.1.0.2\lib\net40\FSharp.Collections.ParallelSeq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FSharp.Data">
       <HintPath>..\packages\FSharp.Data.2.1.1\lib\net40\FSharp.Data.dll</HintPath>
       <Private>True</Private>
