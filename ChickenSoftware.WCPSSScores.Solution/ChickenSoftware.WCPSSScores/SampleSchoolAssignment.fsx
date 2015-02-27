@@ -42,30 +42,26 @@ type System.Random with
         Seq.initInfinite (fun _ -> this.Next(minValue, maxValue))
 
 let random = new System.Random(42)
-let indexes = random.GetValues(1,350000) |> Seq.take(500) |> Seq.toArray
+let indexes = random.GetValues(1,350000) |> Seq.take(2000) |> Seq.toArray
 let allSchools = indexes |> Seq.map(fun i -> getSchools(i)) |> Seq.toArray
-allSchools |> Seq.length
+
+let getNumberOfSchools (trial:int) =
+    let trialSchools = allSchools.[1..trial]
+    let allSchools' = trialSchools |> Seq.filter(fun s -> s.IsSome)
+    let allSchools'' = allSchools' |> Seq.collect(fun s -> s.Value)
+    let uniqueSchools = allSchools'' |> Seq.distinct
+    uniqueSchools |> Seq.length
+
+let trialCount = [|1..1999|]
+
+trialCount |> Seq.map(fun t -> t, getNumberOfSchools(t))
+           |> Seq.iter(fun (t, c) -> printfn "%A %A" t c)
 
 let allSchools' = allSchools |> Seq.filter(fun s -> s.IsSome)
-//allSchools' |> Seq.length
 let allSchools'' = allSchools' |> Seq.collect(fun s -> s.Value)
-//allSchools'' |> Seq.length
 let uniqueSchools = allSchools'' |> Seq.distinct
-uniqueSchools |> Seq.length
+uniqueSchools |> Seq.iter(fun s ->  printfn "%A" s)
 
 
-//allSchools: string[]
-//
-//
-//
-//
-//        let inBase school =
-//            allSchools |> Array.tryFind(fun s -> if s = school then true else false)
-// 
-//        let newSchools = schools |> Array.filter(fun s -> inBase(s).IsNone)
-//        let allSchools' = Array.append allSchools newSchools
-//        getSchools
-//
-//
-//
-//
+
+

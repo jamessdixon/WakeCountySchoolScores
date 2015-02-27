@@ -26,6 +26,5 @@ let highSchools = highRows
 
 let schools = Array.append elemetarySchools middleSchools
 let schools' = Array.append schools highSchools
-
 schools' |> Seq.iter(fun s -> printfn "%A" s.name)
 
