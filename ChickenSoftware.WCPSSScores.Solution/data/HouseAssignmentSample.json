@@ -1,0 +1,14 @@
+{
+  "houseIndex": 1,
+  "schools": [
+    "CONN ES",
+    "DANIELS MS",
+    "BROUGHTON HS"
+  ],
+  "id": "6f119729-9e77-444f-afe2-8f8949dc531a",
+  "_rid": "pmVVAMUE9wABAAAAAAAAAA==",
+  "_ts": 1424372982,
+  "_self": "dbs/pmVVAA==/colls/pmVVAMUE9wA=/docs/pmVVAMUE9wABAAAAAAAAAA==/",
+  "_etag": "\"0000a401-0000-0000-0000-54e634f60000\"",
+  "_attachments": "attachments/"
+}

@@ -7,10 +7,18 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ChickenSoftware.WCPSSScores
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{13537F42-463D-4F63-8E1F-F6E1D7C59614}"
 	ProjectSection(SolutionItems) = preProject
+		data\HouseAssignmentSample.json = data\HouseAssignmentSample.json
 		data\HouseSearchSample01.html = data\HouseSearchSample01.html
 		data\HouseSearchSample02.html = data\HouseSearchSample02.html
 		data\HouseValuationSample.json = data\HouseValuationSample.json
 		data\RealEstateSample.html = data\RealEstateSample.html
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "html", "html", "{B8F03E06-6908-4773-A18F-4AFAFA1775DA}"
+	ProjectSection(SolutionItems) = preProject
+		html\elementarySchools.html = html\elementarySchools.html
+		html\highSchools.html = html\highSchools.html
+		html\middleSchools.html = html\middleSchools.html
 	EndProjectSection
 EndProject
 Global
