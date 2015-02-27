@@ -52,7 +52,8 @@ let getNumberOfSchools (trial:int) =
     let uniqueSchools = allSchools'' |> Seq.distinct
     uniqueSchools |> Seq.length
 
-let trialCount = [|1..1999|]
+
+let trialCount = [|1..9999|]
 
 trialCount |> Seq.map(fun t -> t, getNumberOfSchools(t))
            |> Seq.iter(fun (t, c) -> printfn "%A %A" t c)
