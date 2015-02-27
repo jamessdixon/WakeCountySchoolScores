@@ -55,15 +55,20 @@ let assignSchoolTaxBase (id:int) =
                     |> Some
     | _ -> None
 
-let indexes = [|1..350000|]
+assignSchoolTaxBase 2
+
 
 #time
-indexes |> PSeq.map(fun i -> assignSchoolTaxBase(i))
+let indexes = [|1..350000|]
+let assignedValues = indexes |> PSeq.map(fun i -> assignSchoolTaxBase(i)) |> Seq.toArray
+
+let filePath = @"C:\Git\WakeCountySchoolScores\SchoolValuation.csv"
+
+assignedValues
         |> Seq.filter(fun s -> s.IsSome)
         |> Seq.collect(fun s -> s.Value)   
         |> Seq.groupBy(fun (s,av) -> s)
         |> Seq.map(fun (s,ss) -> s,ss |> Seq.sumBy(fun (s,av)-> av))
-        |> Seq.toArray
-
-indexes
+        |> Seq.map(fun (s,v) -> s + "," + v.ToString() + Environment.NewLine)
+        |> Seq.iter(fun (s) -> File.AppendAllText(filePath, s))
 

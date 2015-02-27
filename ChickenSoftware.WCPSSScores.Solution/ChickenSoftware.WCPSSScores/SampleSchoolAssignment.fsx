@@ -45,13 +45,11 @@ let random = new System.Random(42)
 let indexes = random.GetValues(1,350000) |> Seq.take(10000) |> Seq.toArray
 let allSchools = indexes |> Seq.map(fun i -> getSchools(i)) |> Seq.toArray
 let getNumberOfSchools (trial:int) =
-
     let trialSchools = allSchools.[1..trial]
     let allSchools' = trialSchools |> Seq.filter(fun s -> s.IsSome)
     let allSchools'' = allSchools' |> Seq.collect(fun s -> s.Value)
     let uniqueSchools = allSchools'' |> Seq.distinct
     uniqueSchools |> Seq.length
-
 
 let trialCount = [|1..9999|]
 
