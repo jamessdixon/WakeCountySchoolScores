@@ -42,7 +42,7 @@ type System.Random with
         Seq.initInfinite (fun _ -> this.Next(minValue, maxValue))
 
 let random = new System.Random(42)
-let indexes = random.GetValues(1,350000) |> Seq.take(2000) |> Seq.toArray
+let indexes = random.GetValues(1,350000) |> Seq.take(10000) |> Seq.toArray
 let allSchools = indexes |> Seq.map(fun i -> getSchools(i)) |> Seq.toArray
 
 let getNumberOfSchools (trial:int) =
